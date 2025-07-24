@@ -1,0 +1,49 @@
+@page "/documents"
+@using System.Net.Http
+@using Microsoft.AspNetCore.Components
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<h3>قائمة التوثيقات</h3>
+
+@if (documents == null)
+{
+    <p><em>جاري التحميل...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>رقم التوثيق</th>
+                <th>النوع</th>
+                <th>الحالة</th>
+                <th>التاريخ</th>
+                <th>إجراءات</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var doc in documents)
+            {
+                <tr>
+                    <td>@doc.DocumentID</td>
+                    <td>@doc.Type</td>
+                    <td>@doc.Status</td>
+                    <td>@doc.IssueDate?.ToShortDateString()</td>
+                    <td>
+                        <button class="text-blue-600 hover:text-blue-900 mr-3" @onclick="() => NavigationManager.NavigateTo($"/document/{doc.DocumentID}")">عرض</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Document> documents;
+
+    protected override async Task OnInitializedAsync()
+    {
+        documents = await Http.GetFromJsonAsync<List<Document>>("api/documents");
+    }
+}
